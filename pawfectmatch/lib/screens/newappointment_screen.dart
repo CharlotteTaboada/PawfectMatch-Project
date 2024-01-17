@@ -5,6 +5,10 @@ import 'package:pawfectmatch/screens/appointment_screen.dart';
 import '/repositories/database_repository.dart'; 
 
 class NewAppointmentScreen extends StatefulWidget {
+  final VoidCallback? onAppointmentCreated;
+
+  NewAppointmentScreen({this.onAppointmentCreated});
+
   @override
   _NewAppointmentScreenState createState() => _NewAppointmentScreenState();
 }
@@ -154,14 +158,14 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
     // Get the reference to the 'appointments' collection
     CollectionReference<Map<String, dynamic>> appointments =
         FirebaseFirestore.instance.collection('appointments');
-
+    
     // Create a new document with a unique ID
     DocumentReference<Map<String, dynamic>> newAppointmentRef =
         await appointments.add({
       'user': DatabaseRepository().loggedInOwner,
       'dog': selectedDog,
       'dateTime': selectedDateTime,
-      'status': 'upcoming',
+      'status': 'pending',
       'id': '' // Initialize with an empty string (will be updated later)
     });
 
@@ -179,6 +183,8 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
       context,
       MaterialPageRoute(builder: (context) => AppointmentScreen()),
     );
+
+  widget.onAppointmentCreated?.call();
   } catch (error) {
     print('Error saving appointment: $error');
   }

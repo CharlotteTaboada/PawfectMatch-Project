@@ -16,6 +16,7 @@ class AppointmentScreen extends StatelessWidget {
           title: Text('Appointments'),
           bottom: TabBar(
             tabs: [
+              Tab(text: 'Pending'),
               Tab(text: 'Upcoming'),
               Tab(text: 'Completed'),
               Tab(text: 'Cancelled'),
@@ -24,19 +25,23 @@ class AppointmentScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
+            _AppointmentList(status: 'pending', appointments: [],),
             _AppointmentList(status: 'upcoming', appointments: [],),
             _AppointmentList(status: 'completed', appointments: [],),
             _AppointmentList(status: 'cancelled', appointments: [],),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => NewAppointmentScreen(),
               ),
             );
+            if (result != null && result){
+              DefaultTabController.of(context).animateTo(0);// Switch to the 'Pending' tab
+            }
           },
           child: Icon(Icons.add),
         ),
@@ -48,8 +53,9 @@ class AppointmentScreen extends StatelessWidget {
 class _AppointmentList extends StatelessWidget {
   final String status;
   final List<Appointment> appointments; // Pass the list of Appointment objects
-
-  _AppointmentList({required this.status, required this.appointments});
+  final VoidCallback? onAppointmentCreated; // Callback function
+  
+  _AppointmentList({required this.status, required this.appointments, this.onAppointmentCreated});
 
   @override
   Widget build(BuildContext context) {

@@ -30,7 +30,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
             _buildDetailRow('Status:', appointment.status),
             _buildDetailRow('Date and Time:', _formatDateTime(appointment.date)),
             SizedBox(height: 20),
-            if (appointment.status == 'upcoming') // Show buttons only if the status is 'upcoming'
+            if (appointment.status == 'upcomin' || appointment.status == 'pending' ) // Show buttons only if the status is 'upcoming/pending'
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
