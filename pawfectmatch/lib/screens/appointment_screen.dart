@@ -36,7 +36,7 @@ class AppointmentScreen extends StatelessWidget {
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => NewAppointmentScreen(),
+                builder: (context) => NewAppointmentScreen(convoID: '', uid: '', otherUser: '',),
               ),
             );
             if (result != null && result){

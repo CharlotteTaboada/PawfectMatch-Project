@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pawfectmatch/controller/chat_control.dart';
-import 'package:pawfectmatch/models/models.dart';
 import 'package:pawfectmatch/screens/appointment_screen.dart';
+import 'package:pawfectmatch/utils/appointment_utils.dart';
 
 class ChatScreen extends StatefulWidget {
   final String otherDogName;
@@ -20,6 +21,8 @@ class ChatScreen extends StatefulWidget {
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
+
+  fetchConversation(String convoID) {}
 }
 
 class _ChatScreenState extends State<ChatScreen> {
@@ -71,6 +74,23 @@ class _ChatScreenState extends State<ChatScreen> {
       print('Error fetching dog data: $e');
     }
   }
+
+  Future<void> sendAppointmentDetailsToChat(String selectedDog, DateTime selectedDateTime) async {
+  try {
+    String formattedDateTime = DateFormat('EEE, MMM d, y h:mm a').format(selectedDateTime);
+
+    // Create a message body with appointment details
+    String messageBody = 'New Appointment:\nDog: $selectedDog\nDate and Time: $formattedDateTime';
+
+    // Send the message to the chat using your existing messaging logic
+    sendMessage(uid, widget.otherUser, messageBody, widget.convoID, Timestamp.now());
+
+    // Fetch updated conversation after sending the message
+    await fetchConversations();
+  } catch (error) {
+    print('Error sending appointment details to chat: $error');
+  }
+}
 
   @override
   void initState() {

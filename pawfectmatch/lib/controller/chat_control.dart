@@ -18,7 +18,7 @@ Widget messageInput(
           suffixIcon: GestureDetector(
             onTap: () {
               // Call a function to send the message
-              sendMessage(ctrl.text, convoID, uid, otherid);
+              sendMessage(ctrl.text, convoID, uid, otherid, Timestamp.now());
               // Clear the text field after sending the message
               ctrl.clear();
             },
@@ -125,13 +125,20 @@ Widget buildMessageItem(
 }
 
 void sendMessage(
-    String message, String convoID, String uid, String otherid) async {
+    String message, String convoID, String uid, String otherid, Timestamp timestamp) async {
   try {
     // Get the reference to the messages subcollection of the conversation
     CollectionReference messagesRef = FirebaseFirestore.instance
         .collection('conversations')
         .doc(convoID)
         .collection('messages');
+
+    // Add the message to the subcollection
+    await messagesRef.add({
+      'senderID': uid,
+      'message': message,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
 
     // Create a Message object to represent the data
     Message newMessage = Message(

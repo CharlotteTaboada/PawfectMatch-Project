@@ -30,7 +30,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
             _buildDetailRow('Status:', appointment.status),
             _buildDetailRow('Date and Time:', _formatDateTime(appointment.date)),
             SizedBox(height: 20),
-            if (appointment.status == 'upcomin' || appointment.status == 'pending' ) // Show buttons only if the status is 'upcoming/pending'
+            if (appointment.status == 'upcoming' || appointment.status == 'pending')
+              // Show buttons only if the status is 'upcoming/pending'
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -40,12 +41,13 @@ class AppointmentDetailsScreen extends StatelessWidget {
                     },
                     child: Text('Cancel Appointment'),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _proceedToPayment(context);
-                    },
-                    child: Text('Proceed to Payment'),
-                  ),
+                  if (appointment.status == 'upcoming')
+                    ElevatedButton(
+                      onPressed: () {
+                        _proceedToPayment(context);
+                      },
+                      child: Text('Proceed to Payment'),
+                    ),
                 ],
               ),
           ],
@@ -91,7 +93,6 @@ class AppointmentDetailsScreen extends StatelessWidget {
   void _proceedToPayment(BuildContext context) {
     // Implement logic to proceed to payment screen
     // This could involve navigating to a payment screen or initiating a payment process
-
     // After payment, you might want to go back to the previous screen or refresh the appointment list
     Navigator.pop(context);
   }
