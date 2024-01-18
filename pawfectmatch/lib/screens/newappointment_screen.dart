@@ -2,21 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pawfectmatch/screens/appointment_screen.dart';
-import '/repositories/database_repository.dart';
-import 'package:pawfectmatch/utils/appointment_utils.dart';
+import '/repositories/database_repository.dart'; 
 
 class NewAppointmentScreen extends StatefulWidget {
-  final String convoID;
-  final String uid;
-  final String otherUser;
   final VoidCallback? onAppointmentCreated;
 
-  NewAppointmentScreen({
-    required this.convoID,
-    required this.uid,
-    required this.otherUser,
-    this.onAppointmentCreated,
-  });
+  NewAppointmentScreen({this.onAppointmentCreated});
 
   @override
   _NewAppointmentScreenState createState() => _NewAppointmentScreenState();
@@ -27,49 +18,49 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
   DateTime selectedDateTime = DateTime.now();
 
   Future<List<DropdownMenuItem<String>>> _getMatchedDogs() async {
-    try {
-      DatabaseRepository databaseRepository = DatabaseRepository();
-      await databaseRepository.setLoggedInDog();
+  try {
+    DatabaseRepository databaseRepository = DatabaseRepository();
+    await databaseRepository.setLoggedInDog();
 
-      QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
-          .collection('matches')
-          .where('user1', isEqualTo: databaseRepository.loggedInOwner)
-          .get();
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+        .collection('matches')
+        .where('user1', isEqualTo: databaseRepository.loggedInOwner)
+        .get();
 
-      List<DropdownMenuItem<String>> matchedDogs = [];
+    List<DropdownMenuItem<String>> matchedDogs = [];
 
-      // Add a default item with an empty value
-      matchedDogs.add(
-        DropdownMenuItem<String>(
-          value: '',
-          child: Text('Select Matched Dog'),
-        ),
-      );
+    // Add a default item with an empty value
+    matchedDogs.add(
+      DropdownMenuItem<String>(
+        value: '',
+        child: Text('Select Matched Dog'),
+      ),
+    );
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
-        String matchedDog = await databaseRepository.getDogOwned(doc['user2'] as String);
+    for (QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.docs) {
+      String matchedDog = await databaseRepository.getDogOwned(doc['user2'] as String);
 
-        // Check for duplicates
-        if (matchedDogs.any((item) => item.value == matchedDog)) {
-          continue;
-        }
-
-        if (matchedDog.isNotEmpty) {
-          matchedDogs.add(
-            DropdownMenuItem<String>(
-              value: matchedDog,
-              child: Text(matchedDog),
-            ),
-          );
-        }
+      // Check for duplicates
+      if (matchedDogs.any((item) => item.value == matchedDog)) {
+        continue;
       }
 
-      return matchedDogs;
-    } catch (error) {
-      print('Error getting matched dogs: $error');
-      return [];
+      if (matchedDog.isNotEmpty) {
+        matchedDogs.add(
+          DropdownMenuItem<String>(
+            value: matchedDog,
+            child: Text(matchedDog),
+          ),
+        );
+      }
     }
+
+    return matchedDogs;
+  } catch (error) {
+    print('Error getting matched dogs: $error');
+    return [];
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -163,42 +154,41 @@ class _NewAppointmentScreenState extends State<NewAppointmentScreen> {
   }
 
   void _saveAppointment(String selectedDog, DateTime selectedDateTime) async {
-    try {
-      // Get the reference to the 'appointments' collection
-      CollectionReference<Map<String, dynamic>> appointments =
-          FirebaseFirestore.instance.collection('appointments');
+  try {
+    // Get the reference to the 'appointments' collection
+    CollectionReference<Map<String, dynamic>> appointments =
+        FirebaseFirestore.instance.collection('appointments');
 
-      // Create a new document with a unique ID
-      DocumentReference<Map<String, dynamic>> newAppointmentRef =
-          await appointments.add({
-        'user': DatabaseRepository().loggedInOwner,
-        'dog': selectedDog,
-        'dateTime': selectedDateTime,
-        'status': 'pending',
-        'id': '' // Initialize with an empty string (will be updated later)
-      });
+    // Create a new document with a unique ID
+    DocumentReference<Map<String, dynamic>> newAppointmentRef =
+        await appointments.add({
+      'user': DatabaseRepository().loggedInOwner,
+      'dog': selectedDog,
+      'dateTime': selectedDateTime,
+      'status': 'pending',
+      'id': '' // Initialize with an empty string (will be updated later)
+    });
 
-      // Get the ID of the newly created appointment
-      String appointmentId = newAppointmentRef.id;
+    // Get the ID of the newly created appointment
+    String appointmentId = newAppointmentRef.id;
 
-      // Update the document with the actual ID
-      await newAppointmentRef.update({'id': appointmentId});
+    // Update the document with the actual ID
+    await newAppointmentRef.update({'id': appointmentId});
 
-      // Print or use the appointment ID as needed
-      print('Appointment saved successfully! ID: $appointmentId');
+    // Print or use the appointment ID as needed
+    print('Appointment saved successfully! ID: $appointmentId');
 
-      // Call method to send appointment details to the chat
-      sendAppointmentDetailsToChat(widget.convoID, widget.uid, widget.otherUser, selectedDog, selectedDateTime);
+    // Redirect to AppointmentScreen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => AppointmentScreen()),
+    );
 
-      // Redirect to AppointmentScreen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => AppointmentScreen()),
-      );
-
-      widget.onAppointmentCreated?.call();
-    } catch (error) {
-      print('Error saving appointment: $error');
-    }
+    widget.onAppointmentCreated?.call();
+  } catch (error) {
+    print('Error saving appointment: $error');
   }
+}
+
+
 }

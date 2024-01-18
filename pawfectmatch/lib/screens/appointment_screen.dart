@@ -36,7 +36,7 @@ class AppointmentScreen extends StatelessWidget {
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => NewAppointmentScreen(convoID: '', uid: '', otherUser: '',),
+                builder: (context) => NewAppointmentScreen(),
               ),
             );
             if (result != null && result){
@@ -54,7 +54,7 @@ class _AppointmentList extends StatelessWidget {
   final String status;
   final List<Appointment> appointments; // Pass the list of Appointment objects
   final VoidCallback? onAppointmentCreated; // Callback function
-  
+
   _AppointmentList({required this.status, required this.appointments, this.onAppointmentCreated});
 
   @override
@@ -115,4 +115,3 @@ class _AppointmentList extends StatelessWidget {
     }
   }
 }
-

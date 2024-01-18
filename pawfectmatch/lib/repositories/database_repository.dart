@@ -454,4 +454,3 @@ Future<void> CancelAppointment(String appointmentId) async {
 }
 
  }
-
