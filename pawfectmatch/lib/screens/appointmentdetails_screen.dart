@@ -50,6 +50,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                 if (appointment.status == 'upcoming')
                   ElevatedButton(
                     onPressed: () {
+                      _paidAppointment(context);
                       _proceedToPayment(context);
                     },
                     child: Text('Proceed to Payment'),
@@ -95,7 +96,21 @@ class AppointmentDetailsScreen extends StatelessWidget {
       print('Error cancelling appointment: $error');
     }
   }
+  void _paidAppointment(BuildContext context) async {
+    try {
+      await DatabaseRepository().PaidAppointment(
+        appointment.id,
+      );
 
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AppointmentScreen()),
+      );
+    } catch (error) {
+      // Handle the error (e.g., show an error message)
+      print('Error cancelling appointment: $error');
+    }
+  }
   void _confirmAppointment(BuildContext context) async {
     try {
       // Add logic to update the appointment status to 'upcoming' in the database
@@ -124,7 +139,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
   void _proceedToPayment(BuildContext context) {
     try {
       _launchURL(
-          "https://pm.link/org-CE8qjbKiDcVRAQjPkYns4jk8/test/gp8REXu", context);
+          "https://pm.link/org-CE8qjbKiDcVRAQjPkYns4jk8/test/DTtRuBj", context);
       // Additional logic after launching the URL if needed
     } catch (e) {
       print('Error in _proceedToPayment: $e');

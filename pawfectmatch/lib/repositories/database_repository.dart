@@ -468,5 +468,20 @@ Future<void> confirmAppointment(String appointmentId) async {
     throw error; // Rethrow the error for handling in the calling code
   }
 }
+Future<void> PaidAppointment(String appointmentId) async {
+  try {
+    // Get the reference to the specific appointment document
+    DocumentReference<Map<String, dynamic>> appointmentRef =
+        _firebaseFirestore.collection('appointments').doc(appointmentId);
 
+    // Update the status field
+    await appointmentRef.update({
+      'status': 'completed',
+    });
+  } catch (error) {
+    print('Error updating appointment status: $error');
+    throw error; // Rethrow the error for handling in the calling code
+  }
+}
+ 
  }
