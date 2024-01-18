@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pawfectmatch/models/models.dart';
 
 
@@ -184,16 +185,3 @@ Stream<QuerySnapshot<Map<String, dynamic>>> messageStream(String convoID) {
       .snapshots();
 }
 
-Future<void> sendScheduleMessage(String convoID, String senderID, String receiverID, String scheduleDetails) async {
-  try {
-    await FirebaseFirestore.instance.collection('conversations').doc(convoID).collection('messages').add({
-      'senderID': senderID,
-      'receiverID': receiverID,
-      'messageContent': scheduleDetails,
-      'timestamp': FieldValue.serverTimestamp(),
-      // Add any other necessary fields for the schedule message
-    });
-  } catch (error) {
-    print('Error sending schedule message: $error');
-  }
-}

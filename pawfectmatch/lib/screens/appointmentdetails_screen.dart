@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:pawfectmatch/models/appointment_model.dart';
 import 'package:pawfectmatch/repositories/database_repository.dart';
 import 'package:pawfectmatch/screens/appointment_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppointmentDetailsScreen extends StatelessWidget {
   final Appointment appointment;
@@ -30,25 +31,31 @@ class AppointmentDetailsScreen extends StatelessWidget {
             _buildDetailRow('Status:', appointment.status),
             _buildDetailRow('Date and Time:', _formatDateTime(appointment.date)),
             SizedBox(height: 20),
-             if (appointment.status == 'upcoming' || appointment.status == 'pending')
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                if (appointment.status == 'pending')
                   ElevatedButton(
                     onPressed: () {
-                      _cancelAppointment(context);
+                      _confirmAppointment(context);
                     },
-                    child: Text('Cancel Appointment'),
+                    child: Text('Confirm Appointment'),
                   ),
-                  if (appointment.status == 'upcoming')
-                    ElevatedButton(
-                      onPressed: () {
-                        _proceedToPayment(context);
-                      },
-                      child: Text('Proceed to Payment'),
-                    ),
-                ],
-              ),
+                ElevatedButton(
+                  onPressed: () {
+                    _cancelAppointment(context);
+                  },
+                  child: Text('Cancel Appointment'),
+                ),
+                if (appointment.status == 'upcoming')
+                  ElevatedButton(
+                    onPressed: () {
+                      _proceedToPayment(context);
+                    },
+                    child: Text('Proceed to Payment'),
+                  ),
+              ],
+            ),
           ],
         ),
       ),
@@ -89,11 +96,54 @@ class AppointmentDetailsScreen extends StatelessWidget {
     }
   }
 
-  void _proceedToPayment(BuildContext context) {
-    // Implement logic to proceed to payment screen
-    // This could involve navigating to a payment screen or initiating a payment process
+  void _confirmAppointment(BuildContext context) async {
+    try {
+      // Add logic to update the appointment status to 'upcoming' in the database
+      // You may need to call a function to update the status based on your data model
+      await DatabaseRepository().confirmAppointment(appointment.id);
 
-    // After payment, you might want to go back to the previous screen or refresh the appointment list
-    Navigator.pop(context);
+      // Reload the screen or update the UI as needed
+      // For simplicity, just printing a message here
+      print('Appointment confirmed successfully!');
+
+      // Optionally, show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Appointment confirmed successfully!'),
+      ));
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AppointmentScreen()),
+      );
+    } catch (error) {
+      // Handle the error (e.g., show an error message)
+      print('Error confirming appointment: $error');
+    }
+  }
+
+  void _proceedToPayment(BuildContext context) {
+    try {
+      _launchURL(
+          "https://pm.link/org-CE8qjbKiDcVRAQjPkYns4jk8/test/gp8REXu", context);
+      // Additional logic after launching the URL if needed
+    } catch (e) {
+      print('Error in _proceedToPayment: $e');
+    }
+    //Navigator.pop(context);
+  }
+
+  void _launchURL(String url, BuildContext context) async {
+    try {
+      await launch(url);
+      //await launch(url, forceWebView: true, enableJavaScript: true);
+    } catch (e) {
+      // If an error occurs, try opening in the external browser without WebView
+      try {
+        await launch(url, forceWebView: true, enableJavaScript: true);
+        //await launch(url);
+      } catch (e) {
+        print('Error launching URL: $e');
+      }
+    }
   }
 }

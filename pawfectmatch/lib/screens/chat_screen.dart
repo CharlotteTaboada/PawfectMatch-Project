@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/controller/chat_control.dart';
-import 'package:pawfectmatch/models/models.dart';
 import 'package:pawfectmatch/screens/appointment_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -71,6 +70,8 @@ class _ChatScreenState extends State<ChatScreen> {
       print('Error fetching dog data: $e');
     }
   }
+
+
 
   @override
   void initState() {
